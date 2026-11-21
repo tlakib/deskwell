@@ -17,7 +17,8 @@ Go to the **[Releases page](https://github.com/tlakib/deskwell/releases/latest)*
 
 | You use | Download | Then |
 |---|---|---|
-| **Windows 10/11** | `DeskWell_x.y.z_x64-setup.exe` (or the `.msi`) | Run it. Windows SmartScreen may say "Windows protected your PC" because the installer isn't code-signed yet: click **More info → Run anyway**. |
+| **Windows 10/11 (recommended)** | **[Microsoft Store](https://apps.microsoft.com/detail/9PBZJ6MR67FB)** | Click **Get**. The Store version is signed by Microsoft, so it also installs on PCs with **Smart App Control** turned on. (In Store review from 21 Nov 2026; the link works once it's approved.) |
+| **Windows 10/11 (direct)** | `DeskWell_x.y.z_x64-setup.exe` (or the `.msi`) | Run it. SmartScreen may say "Windows protected your PC": click **More info → Run anyway**. This unsigned build is blocked on PCs with Smart App Control on; use the Store there. |
 | **macOS (Apple Silicon M1–M4)** | `DeskWell_x.y.z_aarch64.dmg` | Open the dmg and drag DeskWell to Applications. The build is unsigned: the first time, **right-click DeskWell → Open → Open**. |
 | **macOS (Intel)** | `DeskWell_x.y.z_x64.dmg` | Same as above. |
 | **Google Chrome** | `deskwell-extension-x.y.z.zip` | Unzip it, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose the unzipped folder. |
