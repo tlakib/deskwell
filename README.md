@@ -116,7 +116,7 @@ Shown honestly in the app as well:
 - **Cloud sync**: local only. Move data with backup/restore. (A sync interface and conflict rules are in the code for later.)
 - **Cloud text-to-speech**: not configured; the bundled voices and system voices work offline.
 - **Idle detection on desktop**: not implemented yet (the Chrome extension supports it).
-- **Code signing**: installers are unsigned, so Windows/macOS show a warning the first time.
+- **Code signing**: installers are unsigned, so Windows/macOS show a warning the first time. On Windows PCs with **Smart App Control** turned on (or a company app policy), Windows blocks unsigned apps completely ("An Application Control policy has blocked this file"), and DeskWell can't be installed there until the installer is code-signed. Use the Chrome extension on those PCs.
 
 ## Credits
 

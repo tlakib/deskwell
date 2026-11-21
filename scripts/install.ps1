@@ -35,7 +35,24 @@ Invoke-WebRequest "$base/$setupName" -OutFile $tmp -UseBasicParsing
 Unblock-File $tmp
 
 Write-Host "Installing (current user, no admin needed)..."
-Start-Process -FilePath $tmp -ArgumentList "/S" -Wait
+try {
+  Start-Process -FilePath $tmp -ArgumentList "/S" -Wait
+} catch {
+  Remove-Item $tmp -ErrorAction SilentlyContinue
+  if ("$_" -match "Application Control|blocked") {
+    Write-Host ""
+    Write-Host "Windows blocked the DeskWell installer." -ForegroundColor Yellow
+    Write-Host "Smart App Control (or a company app policy) is on, and it only allows code-signed apps."
+    Write-Host "DeskWell's installer is not code-signed yet, so it can't be installed on this PC for now."
+    Write-Host "Options:"
+    Write-Host "  - Use the DeskWell Chrome extension instead (works with Smart App Control on)."
+    Write-Host "  - Install on a PC where Smart App Control is off."
+    Write-Host "  - Watch https://github.com/$repo/releases for a signed build."
+    Write-Host "DeskWell will not ask you to turn security features off."
+    return
+  }
+  throw
+}
 Remove-Item $tmp -ErrorAction SilentlyContinue
 
 $exe = Join-Path $env:LOCALAPPDATA "DeskWell\deskwell.exe"
