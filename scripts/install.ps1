@@ -8,13 +8,30 @@ $ProgressPreference = "SilentlyContinue"
 $repo = "tlakib/deskwell"
 
 Write-Host "DeskWell installer" -ForegroundColor Magenta
-$release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest" -Headers @{ "User-Agent" = "deskwell-installer" }
-$asset = $release.assets | Where-Object { $_.name -like "*x64-setup.exe" } | Select-Object -First 1
-if (-not $asset) { throw "No Windows installer found in release $($release.tag_name)." }
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
 
-$tmp = Join-Path $env:TEMP $asset.name
-Write-Host "Downloading $($asset.name) ($([math]::Round($asset.size / 1MB, 1)) MB)..."
-Invoke-WebRequest $asset.browser_download_url -OutFile $tmp
+# Find the latest version from the Releases page redirect (no GitHub API, so no API rate limit).
+function Get-LatestTag {
+  $req = [System.Net.WebRequest]::Create("https://github.com/$repo/releases/latest")
+  $req.AllowAutoRedirect = $false
+  $req.Method = "HEAD"
+  $req.UserAgent = "deskwell-installer"
+  try { $resp = $req.GetResponse() } catch [System.Net.WebException] { $resp = $_.Exception.Response }
+  if (-not $resp) { throw "Could not reach github.com. Check your internet connection." }
+  $location = $resp.Headers["Location"]
+  $resp.Close()
+  if ($location -notmatch "/releases/tag/([^/?#]+)") { throw "Could not find the latest DeskWell release. Download it from https://github.com/$repo/releases/latest" }
+  return $Matches[1]
+}
+
+$tag = Get-LatestTag
+$version = $tag.TrimStart("v")
+$base = "https://github.com/$repo/releases/download/$tag"
+$setupName = "DeskWell_${version}_x64-setup.exe"
+
+$tmp = Join-Path $env:TEMP $setupName
+Write-Host "Downloading DeskWell $version for Windows..."
+Invoke-WebRequest "$base/$setupName" -OutFile $tmp -UseBasicParsing
 Unblock-File $tmp
 
 Write-Host "Installing (current user, no admin needed)..."
@@ -23,19 +40,17 @@ Remove-Item $tmp -ErrorAction SilentlyContinue
 
 $exe = Join-Path $env:LOCALAPPDATA "DeskWell\deskwell.exe"
 if (-not (Test-Path $exe)) { $exe = Get-ChildItem "$env:LOCALAPPDATA\DeskWell" -Filter *.exe -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike "uninstall*" } | Select-Object -First 1 -ExpandProperty FullName }
-if ($exe) { Start-Process $exe; Write-Host "DeskWell $($release.tag_name) installed and started. Look for the icon in the system tray." -ForegroundColor Green }
+if ($exe) { Start-Process $exe; Write-Host "DeskWell $version installed and started. Look for the icon in the system tray." -ForegroundColor Green }
 else { Write-Host "Installed. Start DeskWell from the Start menu." -ForegroundColor Green }
 
 if ($env:DESKWELL_CHROME -eq "1") {
-  $zip = $release.assets | Where-Object { $_.name -like "deskwell-extension-*.zip" } | Select-Object -First 1
-  if ($zip) {
-    $dest = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "DeskWell\chrome-extension"
-    $zipPath = Join-Path $env:TEMP $zip.name
-    Invoke-WebRequest $zip.browser_download_url -OutFile $zipPath
-    if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
-    Expand-Archive $zipPath -DestinationPath $dest
-    Remove-Item $zipPath
-    Write-Host "Chrome extension saved to $dest"
-    Write-Host "In Chrome: open chrome://extensions, turn on Developer mode, click 'Load unpacked' and pick that folder."
-  }
+  $zipName = "deskwell-extension-$version.zip"
+  $dest = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "DeskWell\chrome-extension"
+  $zipPath = Join-Path $env:TEMP $zipName
+  Invoke-WebRequest "$base/$zipName" -OutFile $zipPath -UseBasicParsing
+  if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
+  Expand-Archive $zipPath -DestinationPath $dest
+  Remove-Item $zipPath
+  Write-Host "Chrome extension saved to $dest"
+  Write-Host "In Chrome: open chrome://extensions, turn on Developer mode, click 'Load unpacked' and pick that folder."
 }
