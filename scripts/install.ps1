@@ -11,7 +11,7 @@ Write-Host "DeskWell installer" -ForegroundColor Magenta
 
 # Microsoft Store ID, set once DeskWell is published in the Store. The Store build is signed by Microsoft,
 # so it installs even with Smart App Control on.
-$storeId = ""
+$storeId = "9PBZJ6MR67FB"  # DeskWell on the Microsoft Store
 if ($storeId -and (Get-Command winget -ErrorAction SilentlyContinue)) {
   Write-Host "Installing DeskWell from the Microsoft Store..."
   winget install --id $storeId --source msstore --accept-package-agreements --accept-source-agreements
