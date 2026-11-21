@@ -35,7 +35,10 @@ jobs:
           PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
           PUBLISHER_NAME: ${{ vars.MSIX_PUBLISHER_NAME }}
         run: |
-          if (-not $env:ID_NAME -or -not $env:PUBLISHER) { throw "Set the MSIX_IDENTITY_NAME and MSIX_PUBLISHER repository variables from Partner Center first." }
+          if (-not $env:ID_NAME -or -not $env:PUBLISHER) {
+            Write-Host "::warning::MSIX_IDENTITY_NAME / MSIX_PUBLISHER not set: building a TEST package that the Store will not accept."
+            $env:ID_NAME = "DeskWell.Test"; $env:PUBLISHER = "CN=DeskWellTest"
+          }
           $version = (Get-Content apps/desktop/src-tauri/tauri.conf.json | ConvertFrom-Json).version + ".0"
           $stage = "msix-stage"
           New-Item -ItemType Directory $stage | Out-Null
