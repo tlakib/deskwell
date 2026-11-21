@@ -1,0 +1,22 @@
+{
+  "name": "@deskwell/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "luxon": "3.7.2",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@types/luxon": "3.7.1",
+    "@types/node": "22.15.0",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

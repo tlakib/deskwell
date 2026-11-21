@@ -1,0 +1,16 @@
+{
+  "name": "deskwell",
+  "private": true,
+  "version": "0.1.0",
+  "description": "DeskWell: your personal desk wellness assistant for Windows, macOS and Chrome.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build:ext": "pnpm --filter @deskwell/extension build && pnpm --filter @deskwell/extension package",
+    "dev:desktop": "pnpm --filter @deskwell/desktop tauri dev",
+    "build:desktop": "pnpm --filter @deskwell/desktop tauri build"
+  }
+}

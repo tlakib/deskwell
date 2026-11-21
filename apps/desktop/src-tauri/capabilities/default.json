@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "DeskWell windows may call only DeskWell's own commands and listen to its events.",
+  "windows": ["main", "panel", "popup"],
+  "permissions": ["core:event:default", "core:window:allow-hide", "core:window:allow-close"]
+}

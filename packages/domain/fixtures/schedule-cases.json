@@ -1,0 +1,262 @@
+{
+  "description": "Shared scheduling cases. Run by the TypeScript domain tests AND the Rust desktop scheduler tests so both engines follow identical rules.",
+  "baseSettings": {
+    "workEnabled": true,
+    "activeProfileId": "office",
+    "profiles": [
+      { "id": "office", "name": "Office", "days": [1, 2, 3, 4, 5], "start": "09:00", "end": "18:00", "breaks": [{ "name": "Lunch", "start": "13:00", "end": "14:00" }] },
+      { "id": "night", "name": "Night", "days": [1, 2, 3, 4, 5], "start": "22:00", "end": "06:00", "breaks": [] }
+    ],
+    "quietHours": []
+  },
+  "cases": [
+    {
+      "name": "interval inside work hours, Dhaka",
+      "zone": "Asia/Dhaka",
+      "after": "2026-11-23T03:10:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-23T03:30:00Z"
+    },
+    {
+      "name": "interval before work starts jumps to first slot after window start",
+      "zone": "Europe/Berlin",
+      "after": "2026-11-23T05:00:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-23T08:30:00Z"
+    },
+    {
+      "name": "interval on Friday evening skips the weekend",
+      "zone": "Europe/Berlin",
+      "after": "2026-11-27T17:30:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 60 } },
+      "expect": "2026-11-30T09:00:00Z"
+    },
+    {
+      "name": "interval skips the lunch break",
+      "zone": "UTC",
+      "after": "2026-11-23T12:31:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-23T14:00:00Z"
+    },
+    {
+      "name": "interval with own window ignores work hours",
+      "zone": "UTC",
+      "after": "2026-11-28T10:05:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 20, "days": [6, 7], "window": { "start": "10:00", "end": "12:00" } } },
+      "expect": "2026-11-28T10:20:00Z"
+    },
+    {
+      "name": "interval whole day when work hours disabled for reminder",
+      "zone": "UTC",
+      "after": "2026-11-28T23:50:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 45, "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-11-29T00:00:00Z"
+    },
+    {
+      "name": "night shift window crossing midnight continues after midnight",
+      "zone": "UTC",
+      "after": "2026-11-24T00:10:00Z",
+      "settings": { "activeProfileId": "night" },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 60 } },
+      "expect": "2026-11-24T01:00:00Z"
+    },
+    {
+      "name": "night shift: Saturday early morning belongs to Friday's shift",
+      "zone": "UTC",
+      "after": "2026-11-28T03:30:00Z",
+      "settings": { "activeProfileId": "night" },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 60 } },
+      "expect": "2026-11-28T04:00:00Z"
+    },
+    {
+      "name": "night shift: Sunday early morning has no shift (Saturday not a workday)",
+      "zone": "UTC",
+      "after": "2026-11-29T01:30:00Z",
+      "settings": { "activeProfileId": "night" },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 60 } },
+      "expect": "2026-11-30T23:00:00Z"
+    },
+    {
+      "name": "daily fixed local time keeps wall clock across DST (Berlin, before change)",
+      "zone": "Europe/Berlin",
+      "after": "2026-10-23T09:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["10:30"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-10-24T08:30:00Z"
+    },
+    {
+      "name": "daily fixed local time keeps wall clock across DST (Berlin, after change)",
+      "zone": "Europe/Berlin",
+      "after": "2026-10-24T09:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["10:30"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-10-25T09:30:00Z"
+    },
+    {
+      "name": "spring-forward gap time moves forward by the gap",
+      "zone": "Europe/Berlin",
+      "after": "2026-03-28T12:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["02:30"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-03-29T01:30:00Z"
+    },
+    {
+      "name": "fall-back overlap resolves to the later instant",
+      "zone": "America/New_York",
+      "after": "2026-10-31T12:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["01:30"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-11-01T06:30:00Z"
+    },
+    {
+      "name": "same rule in another timezone follows that zone's wall clock",
+      "zone": "America/Los_Angeles",
+      "after": "2026-11-23T12:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["10:30"], "days": [1, 2, 3, 4, 5], "useWorkHours": false } },
+      "expect": "2026-11-23T18:30:00Z"
+    },
+    {
+      "name": "selected weekdays only",
+      "zone": "UTC",
+      "after": "2026-11-23T12:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["09:00"], "days": [3], "useWorkHours": false } },
+      "expect": "2026-11-25T09:00:00Z"
+    },
+    {
+      "name": "one-time reminder",
+      "zone": "Asia/Dhaka",
+      "after": "2026-11-21T00:00:00Z",
+      "reminder": { "schedule": { "type": "once", "onceAt": "2026-12-01T15:45" } },
+      "expect": "2026-12-01T09:45:00Z"
+    },
+    {
+      "name": "one-time reminder in the past never fires",
+      "zone": "UTC",
+      "after": "2026-12-02T00:00:00Z",
+      "reminder": { "schedule": { "type": "once", "onceAt": "2026-12-01T15:45" } },
+      "expect": null
+    },
+    {
+      "name": "custom dates",
+      "zone": "UTC",
+      "after": "2026-11-21T00:00:00Z",
+      "reminder": { "schedule": { "type": "dates", "dates": ["2026-12-24", "2026-12-10"], "times": ["08:00", "16:00"] } },
+      "expect": "2026-12-10T08:00:00Z"
+    },
+    {
+      "name": "start date in the future",
+      "zone": "UTC",
+      "after": "2026-11-23T09:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["12:00"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false, "startDate": "2026-11-26" } },
+      "expect": "2026-11-26T12:00:00Z"
+    },
+    {
+      "name": "end date passed",
+      "zone": "UTC",
+      "after": "2026-11-23T13:00:00Z",
+      "reminder": { "schedule": { "type": "daily", "times": ["12:00"], "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false, "endDate": "2026-11-23" } },
+      "expect": null
+    },
+    {
+      "name": "overnight quiet hours block an all-day interval",
+      "zone": "UTC",
+      "after": "2026-11-23T22:10:00Z",
+      "settings": { "quietHours": [{ "id": "q", "enabled": true, "start": "22:30", "end": "07:00", "days": [1, 2, 3, 4, 5, 6, 7] }] },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 60, "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-11-24T07:00:00Z"
+    },
+    {
+      "name": "reminder that ignores quiet hours still fires",
+      "zone": "UTC",
+      "after": "2026-11-23T22:10:00Z",
+      "settings": { "quietHours": [{ "id": "q", "enabled": true, "start": "22:30", "end": "07:00", "days": [1, 2, 3, 4, 5, 6, 7] }] },
+      "reminder": { "respectQuietHours": false, "schedule": { "type": "interval", "intervalMinutes": 60, "days": [1, 2, 3, 4, 5, 6, 7], "useWorkHours": false } },
+      "expect": "2026-11-23T23:00:00Z"
+    },
+    {
+      "name": "interval plus fixed times (both)",
+      "zone": "UTC",
+      "after": "2026-11-23T09:31:00Z",
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 120, "times": ["09:45"] } },
+      "expect": "2026-11-23T09:45:00Z"
+    },
+    {
+      "name": "paused until later resumes from pause end without backlog",
+      "zone": "UTC",
+      "after": "2026-11-23T09:05:00Z",
+      "state": { "pausedUntil": "2026-11-23T11:10:00Z" },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-23T11:30:00Z"
+    },
+    {
+      "name": "paused indefinitely",
+      "zone": "UTC",
+      "after": "2026-11-23T09:05:00Z",
+      "state": { "pausedUntil": "indefinite" },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": null
+    },
+    {
+      "name": "snooze fires at snooze end and waits",
+      "zone": "UTC",
+      "after": "2026-11-23T09:31:00Z",
+      "state": { "snoozes": { "r1": "2026-11-23T09:40:00Z" } },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 5 } },
+      "expect": "2026-11-23T09:40:00Z",
+      "expectKind": "snooze"
+    },
+    {
+      "name": "muted for today resumes tomorrow",
+      "zone": "UTC",
+      "after": "2026-11-23T10:00:00Z",
+      "state": { "mutedToday": { "r1": "2026-11-23" } },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-24T09:30:00Z"
+    },
+    {
+      "name": "focus mode skips normal reminders until focus ends",
+      "zone": "UTC",
+      "after": "2026-11-23T10:01:00Z",
+      "state": { "focus": { "kind": "focus", "startedAt": "2026-11-23T10:00:00Z", "endsAt": "2026-11-23T10:50:00Z", "pauseVoice": true, "pausePopup": true, "holdAll": false } },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 20 } },
+      "expect": "2026-11-23T11:00:00Z",
+      "expectKind": "natural"
+    },
+    {
+      "name": "focus mode defers important reminders to focus end",
+      "zone": "UTC",
+      "after": "2026-11-23T10:01:00Z",
+      "state": { "focus": { "kind": "focus", "startedAt": "2026-11-23T10:00:00Z", "endsAt": "2026-11-23T10:50:00Z", "pauseVoice": true, "pausePopup": true, "holdAll": false } },
+      "reminder": { "priority": "important", "schedule": { "type": "interval", "intervalMinutes": 20 } },
+      "expect": "2026-11-23T10:50:00Z",
+      "expectKind": "deferred"
+    },
+    {
+      "name": "meeting mode without holdAll does not move reminders",
+      "zone": "UTC",
+      "after": "2026-11-23T10:01:00Z",
+      "state": { "focus": { "kind": "meeting", "startedAt": "2026-11-23T10:00:00Z", "endsAt": "2026-11-23T10:50:00Z", "pauseVoice": true, "pausePopup": false, "holdAll": false } },
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 20 } },
+      "expect": "2026-11-23T10:20:00Z"
+    },
+    {
+      "name": "reminder that doesn't pause in focus keeps its time",
+      "zone": "UTC",
+      "after": "2026-11-23T10:01:00Z",
+      "state": { "focus": { "kind": "focus", "startedAt": "2026-11-23T10:00:00Z", "endsAt": "2026-11-23T10:50:00Z", "pauseVoice": true, "pausePopup": true, "holdAll": false } },
+      "reminder": { "pauseInFocus": false, "schedule": { "type": "interval", "intervalMinutes": 20 } },
+      "expect": "2026-11-23T10:20:00Z"
+    },
+    {
+      "name": "disabled reminder never fires",
+      "zone": "UTC",
+      "after": "2026-11-23T10:01:00Z",
+      "reminder": { "enabled": false, "schedule": { "type": "interval", "intervalMinutes": 20 } },
+      "expect": null
+    },
+    {
+      "name": "already delivered occurrence is not delivered twice",
+      "zone": "UTC",
+      "after": "2026-11-23T09:59:00Z",
+      "delivered": ["r1@2026-11-23T10:00:00.000Z"],
+      "reminder": { "schedule": { "type": "interval", "intervalMinutes": 30 } },
+      "expect": "2026-11-23T10:30:00Z"
+    }
+  ]
+}

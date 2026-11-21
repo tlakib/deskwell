@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@source "./";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-accent: #6d5dfc;
+  --color-accent-strong: #5a49ee;
+  --color-danger: #dc4b4b;
+  --color-ok: #2f9e6b;
+  --color-bg: var(--dw-bg);
+  --color-surface: var(--dw-surface);
+  --color-surface-2: var(--dw-surface-2);
+  --color-surface-3: var(--dw-surface-3);
+  --color-line: var(--dw-line);
+  --color-fg: var(--dw-fg);
+  --color-fg-muted: var(--dw-fg-muted);
+  --color-fg-subtle: var(--dw-fg-subtle);
+  --font-sans: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Noto Sans Bengali", "Hind Siliguri", Roboto, sans-serif;
+}
+
+:root {
+  --dw-bg: #f6f6fa;
+  --dw-surface: #ffffff;
+  --dw-surface-2: #f3f3f8;
+  --dw-surface-3: #e5e5ef;
+  --dw-line: #e3e3ec;
+  --dw-fg: #1d1c28;
+  --dw-fg-muted: #5e5d70;
+  --dw-fg-subtle: #8a899c;
+  color-scheme: light;
+}
+
+.dark {
+  --dw-bg: #121218;
+  --dw-surface: #1a1a22;
+  --dw-surface-2: #22222c;
+  --dw-surface-3: #2e2e3a;
+  --dw-line: #2c2c38;
+  --dw-fg: #ececf3;
+  --dw-fg-muted: #a5a4b7;
+  --dw-fg-subtle: #75748a;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--dw-bg);
+  color: var(--dw-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
