@@ -22,6 +22,22 @@ Go to the **[Releases page](https://github.com/tlakib/deskwell/releases/latest)*
 | **macOS (Intel)** | `DeskWell_x.y.z_x64.dmg` | Same as above. |
 | **Google Chrome** | `deskwell-extension-x.y.z.zip` | Unzip it, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose the unzipped folder. |
 
+### Or install from the terminal
+
+**Windows** (PowerShell, no admin needed):
+
+```powershell
+irm https://raw.githubusercontent.com/tlakib/deskwell/main/scripts/install.ps1 | iex
+```
+
+**macOS** (Terminal, picks Apple Silicon or Intel automatically):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tlakib/deskwell/main/scripts/install.sh | bash
+```
+
+Want the Chrome extension too? On Windows run `$env:DESKWELL_CHROME = "1"` first; on macOS add `-s -- --chrome` after `bash`. The script downloads it to a folder and tells you where; Chrome only allows unpacked extensions to be added by hand (Developer mode → Load unpacked), which takes a few seconds.
+
 After installing, DeskWell lives in your **system tray** (Windows, bottom-right, maybe under the `^` arrow) or **menu bar** (macOS, top-right). Click the icon for the quick panel; right-click for the menu. Closing the dashboard window keeps DeskWell running; use **Exit** in the tray menu to quit.
 
 The Chrome extension only reminds you while Chrome is running. Use the desktop app if you want reminders all the time.
