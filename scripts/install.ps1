@@ -8,6 +8,16 @@ $ProgressPreference = "SilentlyContinue"
 $repo = "tlakib/deskwell"
 
 Write-Host "DeskWell installer" -ForegroundColor Magenta
+
+# Microsoft Store ID, set once DeskWell is published in the Store. The Store build is signed by Microsoft,
+# so it installs even with Smart App Control on.
+$storeId = ""
+if ($storeId -and (Get-Command winget -ErrorAction SilentlyContinue)) {
+  Write-Host "Installing DeskWell from the Microsoft Store..."
+  winget install --id $storeId --source msstore --accept-package-agreements --accept-source-agreements
+  if ($LASTEXITCODE -eq 0) { Write-Host "DeskWell installed. Start it from the Start menu." -ForegroundColor Green; return }
+  Write-Host "Store install did not finish; trying the GitHub installer instead."
+}
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
 
 # Find the latest version from the Releases page redirect (no GitHub API, so no API rate limit).

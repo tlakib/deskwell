@@ -118,6 +118,17 @@ Shown honestly in the app as well:
 - **Idle detection on desktop**: not implemented yet (the Chrome extension supports it).
 - **Code signing**: installers are unsigned, so Windows/macOS show a warning the first time. On Windows PCs with **Smart App Control** turned on (or a company app policy), Windows blocks unsigned apps completely ("An Application Control policy has blocked this file"), and DeskWell can't be installed there until the installer is code-signed. Use the Chrome extension on those PCs.
 
+## Code signing policy
+
+DeskWell's Windows installers are not code-signed yet. We have applied for free open-source code signing:
+
+- **Microsoft Store**: the Store build is signed by Microsoft after certification (planned).
+- **SignPath Foundation**: free code signing for open-source projects (application in progress). Once approved, release builds will say: *Free code signing provided by SignPath.io, certificate by SignPath Foundation.*
+
+Team roles: Committer, reviewer and approver: [Md Ashik Ali](https://github.com/tlakib). Every release is built by GitHub Actions from this repository's source and approved manually before signing.
+
+Privacy: DeskWell does not send any information to any networked system unless the user asks for it (for example opening the LinkedIn link in About).
+
 ## Credits
 
 - Made by **Md Ashik Ali** · [LinkedIn](https://www.linkedin.com/in/mdashikali/)
