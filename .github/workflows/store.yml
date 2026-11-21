@@ -31,9 +31,11 @@ jobs:
       - name: Pack MSIX
         shell: pwsh
         env:
-          ID_NAME: ${{ vars.MSIX_IDENTITY_NAME }}
-          PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
-          PUBLISHER_NAME: ${{ vars.MSIX_PUBLISHER_NAME }}
+          # DeskWell's public Store identity (Partner Center > Product identity).
+          # Repo variables, when set, take precedence.
+          ID_NAME: ${{ vars.MSIX_IDENTITY_NAME || 'AKIB2.DeskWell' }}
+          PUBLISHER: ${{ vars.MSIX_PUBLISHER || 'CN=A530577E-38F8-4328-99B3-999CE4D7F1A2' }}
+          PUBLISHER_NAME: ${{ vars.MSIX_PUBLISHER_NAME || 'AKIB2' }}
         run: |
           if (-not $env:ID_NAME -or -not $env:PUBLISHER) {
             Write-Host "::warning::MSIX_IDENTITY_NAME / MSIX_PUBLISHER not set: building a TEST package that the Store will not accept."
