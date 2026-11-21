@@ -25,7 +25,13 @@ Go to the **[Releases page](https://github.com/tlakib/deskwell/releases/latest)*
 
 ### Or install from the terminal
 
-**Windows** (PowerShell, no admin needed):
+**Windows** from the Microsoft Store (works with Smart App Control; live once Store review finishes):
+
+```powershell
+winget install --id 9PBZJ6MR67FB --source msstore
+```
+
+Or the DeskWell script (PowerShell, no admin needed), which uses the Store and falls back to the GitHub installer:
 
 ```powershell
 irm https://raw.githubusercontent.com/tlakib/deskwell/main/scripts/install.ps1 | iex
