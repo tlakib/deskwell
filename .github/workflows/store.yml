@@ -10,6 +10,9 @@ name: Microsoft Store package
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   msix:
     runs-on: windows-latest
@@ -58,3 +61,20 @@ jobs:
         with:
           name: deskwell-msix
           path: "*.msix"
+      # Also publish the package on the store-package branch, so Partner Center can be fed
+      # straight from raw.githubusercontent.com without a local download.
+      - name: Publish package to the store-package branch
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $f = Get-ChildItem *.msix | Select-Object -First 1
+          New-Item -ItemType Directory pkg | Out-Null
+          Copy-Item $f.FullName pkg/
+          Set-Location pkg
+          git init -q -b store-package
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -q -m "MSIX $($f.Name) from $env:GITHUB_SHA"
+          git push -f "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY.git" store-package
